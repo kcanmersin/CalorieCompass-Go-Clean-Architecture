@@ -1,0 +1,17 @@
+app:
+  name: 'CalorieCompass'
+  version: '1.0.0'
+
+http:
+  port: '8080'
+
+logger:
+  log_level: 'debug'
+
+postgres:
+  pool_max: 2
+  url: 'postgres://avnadmin:AVNS_QW0zIFe3BIhXNo-yv9W@postgredb-roofstockdev-e00c.b.aivencloud.com:25020/GoDb?sslmode=require'
+
+jwt:
+  secret: 'your-super-secret-key-here'
+  expiration_hours: 24

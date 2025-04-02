@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - CalorieCompass</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to CalorieCompass</h1>
+        
+        {{if .user}}
+        <div class="user-info">
+            <p>Hello, <strong>{{.user.Name}}</strong> ({{.user.Email}})</p>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+        
+        <div class="app-content">
+            <h2>Your Calorie Tracker</h2>
+            <p>This is where your calorie tracking app will be implemented.</p>
+            <p>Features coming soon:</p>
+            <ul>
+                <li>Track daily calories</li>
+                <li>Set calorie goals</li>
+                <li>Food database</li>
+                <li>Nutrition analysis</li>
+            </ul>
+        </div>
+        {{else}}
+        <div class="auth-buttons">
+            <p>Please login or register to use CalorieCompass</p>
+            <div class="button-group">
+                <a href="/login" class="btn">Login</a>
+                <a href="/register" class="btn">Register</a>
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <h2>Track Your Nutrition Journey</h2>
+            <p>CalorieCompass helps you track your calories and nutrition with ease.</p>
+        </div>
+        {{end}}
+    </div>
+</body>
+</html>

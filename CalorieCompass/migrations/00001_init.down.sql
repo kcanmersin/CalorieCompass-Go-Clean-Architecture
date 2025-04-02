@@ -1,0 +1,3 @@
+DROP INDEX IF EXISTS auth.idx_users_email;
+DROP TABLE IF EXISTS auth.users;
+DROP SCHEMA IF EXISTS auth;
