@@ -1,11 +1,12 @@
+// user.go
 package v1
 
 import (
 	"context"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"CalorieCompass/internal/entity"
+	"github.com/gin-gonic/gin"
 )
 
 type UserUseCase interface {

@@ -7,6 +7,8 @@ import (
 	"syscall"
 
 	"github.com/gin-gonic/gin"
+
+	// Import required packages
 	"CalorieCompass/internal/controller/html"
 	v1 "CalorieCompass/internal/controller/http/v1"
 	"CalorieCompass/internal/pkg/config"
@@ -16,6 +18,11 @@ import (
 	"CalorieCompass/internal/repository/token"
 	"CalorieCompass/internal/usecase"
 	pg "CalorieCompass/pkg/postgres"
+
+	// Swagger docs
+	_ "CalorieCompass/docs"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func Run(configPath string) {
@@ -41,15 +48,23 @@ func Run(configPath string) {
 
 	// Use cases
 	authUseCase := usecase.NewAuthUseCase(userRepo, jwtRepo, hasher)
+	userUseCase := usecase.NewUserUseCase(userRepo)
 
 	// HTTP Server
 	router := gin.Default()
+
+	// Set up static files and templates
 	router.LoadHTMLGlob("templates/**/*")
 	router.Static("/static", "./static")
 
+	// Swagger - make sure URL is correct and appears before routes
+	url := ginSwagger.URL("/swagger/doc.json") // The URL pointing to API definition
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+
 	// HTTP controllers
 	authController := v1.NewAuthController(authUseCase)
-	v1.NewRouter(router, authController, jwtRepo)
+	userController := v1.NewUserController(userUseCase)
+	v1.NewRouter(router, authController, userController, jwtRepo)
 
 	// HTML controllers
 	htmlAuthController := html.NewAuthController(authUseCase)

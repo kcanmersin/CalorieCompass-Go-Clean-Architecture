@@ -1,15 +1,15 @@
 package v1
 
 import (
-	"github.com/gin-gonic/gin"
 	"CalorieCompass/internal/controller/http/middleware"
+	"github.com/gin-gonic/gin"
 )
 
 type TokenValidator interface {
 	ValidateToken(token string) (int64, error)
 }
 
-func NewRouter(handler *gin.Engine, authController *AuthController, tokenRepo TokenValidator) {
+func NewRouter(handler *gin.Engine, authController *AuthController, userController *UserController, tokenRepo TokenValidator) {
 	h := handler.Group("/api/v1")
 
 	auth := h.Group("/auth")
@@ -21,6 +21,6 @@ func NewRouter(handler *gin.Engine, authController *AuthController, tokenRepo To
 	user := h.Group("/user")
 	user.Use(middleware.JWTAuth(tokenRepo))
 	{
-		// Protected routes
+		user.GET("", userController.GetUserInfo)
 	}
 }

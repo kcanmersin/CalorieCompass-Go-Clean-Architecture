@@ -20,3 +20,8 @@ migrate-down:
 
 swag:
 	swag init -g cmd/app/main.go
+
+dev:
+	air
+
+.PHONY: build run clean test migrate-up migrate-down swag dev

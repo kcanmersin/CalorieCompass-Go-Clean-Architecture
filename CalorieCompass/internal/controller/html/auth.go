@@ -1,8 +1,9 @@
 package html
 
 import (
-	
 	"context"
+	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -37,13 +38,28 @@ func (c *AuthController) ShowRegisterPage(ctx *gin.Context) {
 }
 
 func (c *AuthController) ProcessLogin(ctx *gin.Context) {
-	var input entity.UserLogin
-	if err := ctx.ShouldBind(&input); err != nil {
+	// Log form data to debug
+	err := ctx.Request.ParseForm()
+	if err != nil {
+		log.Printf("Error parsing form: %v", err)
+	}
+	log.Printf("Login Form data: %v", ctx.Request.PostForm)
+
+	// Explicitly extract form fields
+	email := ctx.PostForm("Email")
+	password := ctx.PostForm("Password")
+	
+	if email == "" || password == "" {
 		ctx.HTML(http.StatusBadRequest, "login.html", gin.H{
 			"title": "Login",
-			"error": err.Error(),
+			"error": "Email and password are required",
 		})
 		return
+	}
+
+	input := entity.UserLogin{
+		Email: email,
+		Password: password,
 	}
 
 	response, err := c.authUseCase.Login(ctx.Request.Context(), input)
@@ -60,13 +76,31 @@ func (c *AuthController) ProcessLogin(ctx *gin.Context) {
 }
 
 func (c *AuthController) ProcessRegister(ctx *gin.Context) {
-	var input entity.UserSignUp
-	if err := ctx.ShouldBind(&input); err != nil {
+	// Log form data to debug
+	err := ctx.Request.ParseForm()
+	if err != nil {
+		log.Printf("Error parsing form: %v", err)
+	}
+	log.Printf("Register Form data: %v", ctx.Request.PostForm)
+
+	// Explicitly extract form fields
+	name := ctx.PostForm("Name")
+	email := ctx.PostForm("Email")
+	password := ctx.PostForm("Password")
+	
+	if name == "" || email == "" || password == "" {
+		errorMsg := fmt.Sprintf("Missing required fields. Name: %s, Email: %s, Password: [hidden]", name, email)
 		ctx.HTML(http.StatusBadRequest, "register.html", gin.H{
 			"title": "Register",
-			"error": err.Error(),
+			"error": errorMsg,
 		})
 		return
+	}
+
+	input := entity.UserSignUp{
+		Name: name,
+		Email: email,
+		Password: password,
 	}
 
 	response, err := c.authUseCase.SignUp(ctx.Request.Context(), input)

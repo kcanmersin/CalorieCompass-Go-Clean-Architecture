@@ -1,11 +1,12 @@
+// auth.go
 package v1
 
 import (
-		"context"
+	"context"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"CalorieCompass/internal/entity"
+	"github.com/gin-gonic/gin"
 )
 
 type AuthUseCase interface {
@@ -33,7 +34,7 @@ func NewAuthController(authUseCase AuthUseCase) *AuthController {
 // @Success 201 {object} entity.AuthResponse
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
-// @Router /auth/sign-up [post]
+// @Router /api/v1/auth/sign-up [post]
 func (c *AuthController) SignUp(ctx *gin.Context) {
 	var input entity.UserSignUp
 	if err := ctx.ShouldBindJSON(&input); err != nil {

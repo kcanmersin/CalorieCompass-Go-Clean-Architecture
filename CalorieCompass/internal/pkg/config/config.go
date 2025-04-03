@@ -2,9 +2,10 @@ package config
 
 import (
 	"fmt"
-	"os"
-
+	"github.com/joho/godotenv"
 	"gopkg.in/yaml.v3"
+	"os"
+	"strings"
 )
 
 type (
@@ -40,7 +41,20 @@ type (
 	}
 )
 
+func substituteEnvVars(s string) string {
+	if !strings.Contains(s, "${") {
+		return s
+	}
+
+	return os.Expand(s, func(key string) string {
+		return os.Getenv(key)
+	})
+}
+
 func NewConfig(configPath string) (*Config, error) {
+	// Load .env file if it exists
+	_ = godotenv.Load()
+
 	configFile, err := os.Open(configPath)
 	if err != nil {
 		return nil, fmt.Errorf("open config file error: %w", err)
@@ -51,6 +65,11 @@ func NewConfig(configPath string) (*Config, error) {
 	decoder := yaml.NewDecoder(configFile)
 	if err := decoder.Decode(&config); err != nil {
 		return nil, fmt.Errorf("decode config error: %w", err)
+	}
+
+	// Override with environment variables if they exist
+	if connStr := os.Getenv("CONNECTION_STRING"); connStr != "" {
+		config.Postgres.URL = connStr
 	}
 
 	return config, nil
