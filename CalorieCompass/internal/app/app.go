@@ -14,8 +14,10 @@ import (
 	"CalorieCompass/internal/pkg/config"
 	"CalorieCompass/internal/pkg/hash"
 	"CalorieCompass/internal/pkg/httpserver"
+	"CalorieCompass/internal/repository/fatsecret"
 	"CalorieCompass/internal/repository/postgres"
 	"CalorieCompass/internal/repository/token"
+	"CalorieCompass/internal/service"
 	"CalorieCompass/internal/usecase"
 	pg "CalorieCompass/pkg/postgres"
 
@@ -39,9 +41,18 @@ func Run(configPath string) {
 	}
 	defer postgresDB.Close()
 
+	// FatSecret Service
+	fatSecretService := service.NewFatSecretService(
+		cfg.FatSecret.ClientID,
+		cfg.FatSecret.ClientSecret,
+		cfg.FatSecret.ConsumerKey,
+		cfg.FatSecret.ConsumerSecret,
+	)
+
 	// Repositories
 	userRepo := postgres.NewUserRepo(postgresDB.DB)
 	jwtRepo := token.NewJWTRepo(cfg.JWT.Secret, cfg.JWT.ExpirationHour)
+	foodRepo := fatsecret.NewFoodRepository(fatSecretService)
 
 	// Hasher
 	hasher := hash.NewHasher(14)
@@ -49,6 +60,7 @@ func Run(configPath string) {
 	// Use cases
 	authUseCase := usecase.NewAuthUseCase(userRepo, jwtRepo, hasher)
 	userUseCase := usecase.NewUserUseCase(userRepo)
+	foodUseCase := usecase.NewFoodUseCase(foodRepo)
 
 	// HTTP Server
 	router := gin.Default()
@@ -64,7 +76,8 @@ func Run(configPath string) {
 	// HTTP controllers
 	authController := v1.NewAuthController(authUseCase)
 	userController := v1.NewUserController(userUseCase)
-	v1.NewRouter(router, authController, userController, jwtRepo)
+	foodController := v1.NewFoodController(foodUseCase)
+	v1.NewRouter(router, authController, userController, foodController, jwtRepo)
 
 	// HTML controllers
 	htmlAuthController := html.NewAuthController(authUseCase)

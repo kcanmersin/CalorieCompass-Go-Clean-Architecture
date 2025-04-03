@@ -10,11 +10,12 @@ import (
 
 type (
 	Config struct {
-		App      `yaml:"app"`
-		HTTP     `yaml:"http"`
-		Log      `yaml:"logger"`
-		Postgres `yaml:"postgres"`
-		JWT      `yaml:"jwt"`
+		App       `yaml:"app"`
+		HTTP      `yaml:"http"`
+		Log       `yaml:"logger"`
+		Postgres  `yaml:"postgres"`
+		JWT       `yaml:"jwt"`
+		FatSecret `yaml:"fatsecret"`
 	}
 
 	App struct {
@@ -38,6 +39,13 @@ type (
 	JWT struct {
 		Secret         string `yaml:"secret"`
 		ExpirationHour int    `yaml:"expiration_hours"`
+	}
+
+	FatSecret struct {
+		ClientID       string `yaml:"client_id"`
+		ClientSecret   string `yaml:"client_secret"`
+		ConsumerKey    string `yaml:"consumer_key"`
+		ConsumerSecret string `yaml:"consumer_secret"`
 	}
 )
 
@@ -70,6 +78,20 @@ func NewConfig(configPath string) (*Config, error) {
 	// Override with environment variables if they exist
 	if connStr := os.Getenv("CONNECTION_STRING"); connStr != "" {
 		config.Postgres.URL = connStr
+	}
+
+	// Load FatSecret API credentials from environment variables
+	if clientID := os.Getenv("FATSECRET_CLIENT_ID"); clientID != "" {
+		config.FatSecret.ClientID = clientID
+	}
+	if clientSecret := os.Getenv("FATSECRET_CLIENT_SECRET"); clientSecret != "" {
+		config.FatSecret.ClientSecret = clientSecret
+	}
+	if consumerKey := os.Getenv("FATSECRET_CONSUMER_KEY"); consumerKey != "" {
+		config.FatSecret.ConsumerKey = consumerKey
+	}
+	if consumerSecret := os.Getenv("FATSECRET_CONSUMER_SECRET"); consumerSecret != "" {
+		config.FatSecret.ConsumerSecret = consumerSecret
 	}
 
 	return config, nil

@@ -15,3 +15,9 @@ postgres:
 jwt:
   secret: 'your-super-secret-key-here'
   expiration_hours: 24
+
+fatsecret:
+  client_id: "${FATSECRET_CLIENT_ID}"
+  client_secret: "${FATSECRET_CLIENT_SECRET}"
+  consumer_key: "${FATSECRET_CONSUMER_KEY}"
+  consumer_secret: "${FATSECRET_CONSUMER_SECRET}"

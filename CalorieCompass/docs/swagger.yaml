@@ -1,3 +1,4 @@
+basePath: /
 definitions:
   entity.AuthResponse:
     properties:
@@ -6,6 +7,88 @@ definitions:
         type: string
       user:
         $ref: '#/definitions/entity.UserResponse'
+    type: object
+  entity.Food:
+    properties:
+      brand_name:
+        type: string
+      calories:
+        type: number
+      carbs:
+        type: number
+      fat:
+        type: number
+      id:
+        type: string
+      name:
+        type: string
+      protein:
+        type: number
+      type:
+        type: string
+      url:
+        type: string
+    type: object
+  entity.FoodDetails:
+    properties:
+      brand_name:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      servings:
+        items:
+          $ref: '#/definitions/entity.Serving'
+        type: array
+    type: object
+  entity.FoodSearchResponse:
+    properties:
+      foods:
+        items:
+          $ref: '#/definitions/entity.Food'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total_results:
+        type: integer
+    type: object
+  entity.Serving:
+    properties:
+      calories:
+        type: number
+      carbs:
+        type: number
+      cholesterol:
+        type: number
+      description:
+        type: string
+      fat:
+        type: number
+      fiber:
+        type: number
+      id:
+        type: string
+      measurement_description:
+        type: string
+      metric_serving_amount:
+        type: number
+      metric_serving_unit:
+        type: string
+      number_of_units:
+        type: number
+      protein:
+        type: number
+      saturated_fat:
+        type: number
+      sodium:
+        type: number
+      sugar:
+        type: number
+      url:
+        type: string
     type: object
   entity.UserLogin:
     properties:
@@ -48,8 +131,12 @@ definitions:
     - name
     - password
     type: object
+host: localhost:8080
 info:
   contact: {}
+  description: A calorie tracking API with authentication
+  title: CalorieCompass API
+  version: "1.0"
 paths:
   /auth/login:
     post:
@@ -120,6 +207,83 @@ paths:
       summary: Register user
       tags:
       - auth
+  /food/{food_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get detailed information about a specific food
+      parameters:
+      - description: Food ID
+        in: path
+        name: food_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.FoodDetails'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get food details
+      tags:
+      - food
+  /food/search:
+    get:
+      consumes:
+      - application/json
+      description: Search for foods by name
+      parameters:
+      - description: Search query
+        in: query
+        name: query
+        required: true
+        type: string
+      - default: 0
+        description: Page number (0-based)
+        in: query
+        name: page
+        type: integer
+      - default: 50
+        description: Results per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.FoodSearchResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Search foods
+      tags:
+      - food
   /user:
     get:
       consumes:
@@ -147,4 +311,9 @@ paths:
       summary: Get user by ID
       tags:
       - user
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
